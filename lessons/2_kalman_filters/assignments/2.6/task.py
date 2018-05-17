@@ -144,11 +144,32 @@ def calculate(measurements, initial_xy):
   u = matrix([[0.], [0.], [0.], [0.]]) # external motion
 
   ### fill this in: ###
-  P =  # initial uncertainty
-  F =  # next state function
-  H =  # measurement function
-  R =  # measurement uncertainty
-  I =  # identity matrix
+
+  # initial uncertainty: 0 for positions x and y, 1000 for the two velocities
+  P = matrix([[    0.,    0.,    0.,    0. ],
+              [    0.,    0.,    0.,    0. ],
+              [    0.,    0., 1000.,    0. ],
+              [    0.,    0.,    0., 1000. ],])
+
+  # next state function: generalize the 2d version to 4d
+  F = matrix([[ 1., 0., dt, 0. ],
+              [ 0., 1., 0., dt ],
+              [ 0., 0., 1., 0. ],
+              [ 0., 0., 0., 1. ]])
+
+  # measurement function: reflect the fact that we observe x and y but not the two velocities
+  H = matrix([[ 1., 0., 0., 0. ],
+              [ 0., 1., 0., 0. ]])
+
+  # measurement uncertainty: use 2x2 matrix with 0.1 as main diagonal
+  R = matrix([[ 0.1, 0. ],
+              [ 0., 0.1 ]])
+
+  # 4d identity matrix
+  I = matrix([[ 1., 0., 0., 0. ],
+              [ 0., 1., 0., 0. ],
+              [ 0., 0., 1., 0. ],
+              [ 0., 0., 0., 1. ]])
 
   def filter(x, P):
     for n in range(len(measurements)):
