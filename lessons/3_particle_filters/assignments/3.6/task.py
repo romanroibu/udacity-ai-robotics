@@ -138,6 +138,30 @@ class robot:
     #           self.steering_noise
     #           self.distance_noise
 
+    def move(self, motion):
+
+        steering, distance = motion[0], motion[1]
+        steering = random.gauss(steering, self.steering_noise)
+        distance = random.gauss(distance, self.distance_noise)
+        
+        angle = distance / self.length * tan(steering)
+
+        new_robot = self.copy()
+        new_robot.orientation = (self.orientation + angle) % (2 * pi)
+
+        if abs(angle) < 0.001: #straight motion
+            new_robot.x = self.x + distance * cos(self.orientation)
+            new_robot.y = self.y + distance * sin(self.orientation)
+        else:
+            radius = distance / angle
+            cx = self.x - sin(self.orientation) * radius
+            cy = self.y + cos(self.orientation) * radius
+            new_robot.x = cx + sin(new_robot.orientation) * radius
+            new_robot.y = cy - cos(new_robot.orientation) * radius
+
+        return new_robot # make sure your move function returns an instance
+                      # of the robot class with the correct coordinates.
+
     # --------
     # sense: 
     #    
@@ -146,6 +170,40 @@ class robot:
     # and modify it so that it simulates bearing noise
     # according to
     #           self.bearing_noise
+
+    def sense(self, add_noise=True):
+
+        def bearing(landmark):
+
+            x = landmark[1]
+            y = landmark[0]
+
+            dx = x - self.x
+            dy = y - self.y
+
+            bearing = atan2(dy, dx) - self.orientation
+
+            if add_noise:
+                bearing = random.gauss(bearing, self.bearing_noise)
+
+            return bearing
+
+        return [ bearing(l) % (2. * pi) for l in landmarks ]
+
+    def copy(self):
+
+        result = robot()
+
+        result.x = self.x
+        result.y = self.y
+        result.orientation = self.orientation
+
+        result.length         = self.length
+        result.bearing_noise  = self.bearing_noise
+        result.steering_noise = self.steering_noise
+        result.distance_noise = self.distance_noise
+
+        return result
 
     ############## ONLY ADD/MODIFY CODE ABOVE HERE ####################
 
