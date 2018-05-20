@@ -98,10 +98,44 @@ class robot:
     def move(self, motion): # Do not change the name of this function
 
         # ENTER YOUR CODE HERE
-        
+
+        steering, distance = motion[0], motion[1]
+        steering = random.gauss(steering, self.steering_noise)
+        distance = random.gauss(distance, self.distance_noise)
+
+        angle = distance / self.length * tan(steering)
+
+        result = self.copy()
+        result.orientation = (self.orientation + angle) % (2 * pi)
+
+        if abs(angle) < 0.001: #straight motion
+            result.x = self.x + distance * cos(self.orientation)
+            result.y = self.y + distance * sin(self.orientation)
+        else:
+            radius = distance / angle
+            cx = self.x - sin(self.orientation) * radius
+            cy = self.y + cos(self.orientation) * radius
+            result.x = cx + sin(result.orientation) * radius
+            result.y = cy - cos(result.orientation) * radius
+
         return result # make sure your move function returns an instance
                       # of the robot class with the correct coordinates.
-                      
+
+    def copy(self):
+
+        result = robot()
+
+        result.x = self.x
+        result.y = self.y
+        result.orientation = self.orientation
+
+        result.length         = self.length
+        result.bearing_noise  = self.bearing_noise
+        result.steering_noise = self.steering_noise
+        result.distance_noise = self.distance_noise
+
+        return result
+
     ############## ONLY ADD/MODIFY CODE ABOVE HERE ####################
         
 
