@@ -98,8 +98,22 @@ class robot:
         # ENTER CODE HERE
         # HINT: You will probably need to use the function atan2()
 
+        def bearing(landmark):
+
+            x = landmark[1]
+            y = landmark[0]
+
+            dx = x - self.x
+            dy = y - self.y
+
+            bearing = atan2(dy, dx) - self.orientation
+
+            return bearing
+
+        Z = [ bearing(landmarks[i]) % (2. * pi) for i in range(len(landmarks)) ]
+
         return Z #Leave this line here. Return vector Z of 4 bearings.
-    
+
     ############## ONLY ADD/MODIFY CODE ABOVE HERE ####################
 
 
